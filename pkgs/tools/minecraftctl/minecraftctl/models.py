@@ -1,6 +1,7 @@
 from logging import fatal
 from typing import Literal, Union
 from pydantic import BaseModel, RootModel
+from .utils import fatal
 
 
 class TmuxConfig(BaseModel):
@@ -53,9 +54,10 @@ class ServersJson:
         self._dict = InternalServersJson.model_validate(json).root
 
     def __getitem__(self, key: str) -> MinecraftServer:
-        if key not in self._dict:
+        try:
+            return self._dict[key]
+        except KeyError:
             fatal(f"Server '{key}' not found in servers.json")
-        return self._dict[key]
 
     def __iter__(self):
         return iter(self._dict)

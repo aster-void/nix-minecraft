@@ -1,5 +1,5 @@
 import sys, subprocess
-from typing import Any, List
+from typing import Any, List, Never
 
 
 def printerr(*values: object):
@@ -10,7 +10,7 @@ def warn(*values: object):
     printerr("[WARNING] minecraftctl:", *values)
 
 
-def fatal(*values: object, exit_code: int = 1):
+def fatal(*values: object, exit_code: int = 1) -> Never:
     printerr("[FATAL] minecrafctl:", *values)
     sys.exit(exit_code)
 
