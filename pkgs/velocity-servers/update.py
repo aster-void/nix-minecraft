@@ -11,6 +11,7 @@ ENDPOINT = "https://api.papermc.io/v2/projects/velocity"
 TIMEOUT = 5
 RETRIES = 5
 
+
 class TimeoutHTTPAdapter(HTTPAdapter):
     def __init__(self, *args, **kwargs):
         self.timeout = TIMEOUT
@@ -28,8 +29,10 @@ class TimeoutHTTPAdapter(HTTPAdapter):
 
 def make_client():
     http = requests.Session()
-    retries = Retry(total=RETRIES, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])
-    http.mount('https://', TimeoutHTTPAdapter(max_retries=retries))
+    retries = Retry(
+        total=RETRIES, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504]
+    )
+    http.mount("https://", TimeoutHTTPAdapter(max_retries=retries))
     return http
 
 
