@@ -7,6 +7,10 @@ py.pkgs.buildPythonApplication {
   pyproject = true;
   src = ./.;
   nativeBuildInputs = [ py.pkgs.setuptools ];
-  propagatedBuildInputs = with py.pkgs; [ requests ];
-  pythonImportsCheck = [ "main" ];
+  propagatedBuildInputs = [
+    py.pkgs.httpx
+    py.pkgs.typer
+    py.pkgs.pydantic
+  ];
+  pythonImportsCheck = [ "minecraftctl.main" ];
 }

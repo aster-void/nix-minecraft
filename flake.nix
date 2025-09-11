@@ -88,6 +88,18 @@
         checks = mkTests (pkgs.extend self.outputs.overlays.default) // packages;
 
         formatter = pkgs.nixfmt-rfc-style;
+
+        devShells.default =
+        let
+          py = pkgs.python313;
+          in
+           pkgs.mkShell 
+          {
+          buildInputs = with pkgs; [
+            py.pkgs.typer
+            pkgs.pdm
+          ];
+        };
       }
     );
 }

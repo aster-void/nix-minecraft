@@ -1,9 +1,5 @@
-import os, sys, subprocess, json, configparser
-from typing import List
-
-from config import serversJsonPath
-from models import MinecraftServer, ServersJson
-
+import sys, subprocess
+from typing import Any, List
 
 def printerr(*values: object):
     print(*values, file=sys.stderr)
@@ -18,7 +14,7 @@ def fatal(*values: object, exit_code: int = 1):
     sys.exit(exit_code)
 
 
-def run(cmd: List[str], stdin: str = None) -> str:
+def run(cmd: List[str], stdin: str | None = None) -> str:
     result = subprocess.run(cmd, text=True, input=stdin, capture_output=True)
     if result.returncode != 0:
         err = ChildProcessError(result.stderr)
@@ -27,23 +23,7 @@ def run(cmd: List[str], stdin: str = None) -> str:
     return result.stdout
 
 
-def load_servers_json() -> ServersJson:
-    path = serversJsonPath
-    if not os.path.exists(path):
-        warn(f"Servers definition file does not exist at {path}")
-        return {}
-
-    with open(path) as f:
-        return ServersJson(**json.loads(f.read()))
-
-
-def get_instance(servers: ServersJson, instance: str) -> MinecraftServer:
-    if not instance in servers:
-        fatal(f"Instance not found: {instance}")
-    return MinecraftServer(**servers[instance])
-
-
-def pretty_table(headers: List[str], body: List[List[str]]):
+def pretty_table(headers: List[str], body: List[List[Any]]):
     out = ""
     # calculate good-looking length
     max_lens: List[int] = []
