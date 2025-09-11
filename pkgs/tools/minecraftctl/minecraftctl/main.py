@@ -62,15 +62,10 @@ def send(instance: str, command: List[str] = typer.Argument(...)):
             ]
         )
     elif cfg.managementSystem.type == "systemd-socket":
+        file=cfg.managementSystem.systemdSocket.stdinSocket.path
         stdin = " ".join(command) + "\n"
-        exec(
-            [
-                "socat",
-                "-",
-                f"UNIX-CONNECT:{cfg.managementSystem.systemdSocket.stdinSocket.path}",
-            ],
-            stdin=stdin,
-        )
+        with open(file, "w") as sock:
+            sock.write(stdin)
     else:
         fatal(f"Unknown management system: {cfg.managementSystem.type}")
 
