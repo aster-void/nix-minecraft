@@ -25,13 +25,16 @@ class SystemdSocketManagement(BaseModel):
 
 ManagementSystem = Union[TmuxManagement, SystemdSocketManagement]
 
-MCServerType = Literal["vanilla", "fabric", "legacy fabric", "quilt", "paper"]
+MCServerType = Literal[
+    "vanilla",
+    "fabric",
+    "legacy fabric", "quilt", "paper", "velocity"]
 
 
 class MinecraftServer(BaseModel):
     name: str
     type: MCServerType
-    mcVersion: str
+    mcVersion: str | None # velocity doesn't have a mcVersion
     port: int
     dataDir: str
     serviceName: str
