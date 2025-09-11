@@ -8,7 +8,7 @@ from .utils import (
     fatal,
     get_service_status,
     pretty_table,
-    run,
+    exec,
 )
 from .config import load_servers_json
 
@@ -39,7 +39,7 @@ def list():
 def status(instance: str):
     servers = load_servers_json()
     cfg = servers[instance]
-    run(["systemctl", "status", cfg.serviceName])
+    exec(["systemctl", "status", cfg.serviceName, "--no-pager"])
 
 
 @app.command(help="send a command to the instance")
@@ -48,7 +48,7 @@ def send(instance: str, command: List[str] = typer.Argument(...)):
     cfg = servers[instance]
     if cfg.managementSystem.type == "tmux":
         cmd = " ".join(command)
-        run(
+        exec(
             [
                 "tmux",
                 "send-keys",
@@ -60,7 +60,7 @@ def send(instance: str, command: List[str] = typer.Argument(...)):
         )
     elif cfg.managementSystem.type == "systemd-socket":
         stdin = " ".join(command) + "\n"
-        run(
+        exec(
             [
                 "socat",
                 "-",
@@ -90,7 +90,7 @@ def tail(instance: str, follow: bool = False, retry: bool = False, F: bool = Fal
     if not os.path.isfile(log_file) and not do_retry:
         fatal(f"Log file not found: {log_file}")
     try:
-        run(["tail"] + tail_args)
+        exec(["tail"] + tail_args)
     except KeyboardInterrupt:
         pass
 
@@ -99,19 +99,19 @@ def tail(instance: str, follow: bool = False, retry: bool = False, F: bool = Fal
 def restart(instance: str):
     servers = load_servers_json()
     service = servers[instance].serviceName
-    run(["systemctl", "restart", service])
+    exec(["systemctl", "restart", service])
 
 @app.command(help="start the systemd service of the instance")
 def start(instance: str):
     servers = load_servers_json()
     service = servers[instance].serviceName
-    run(["systemctl", "start", service])
+    exec(["systemctl", "start", service])
 
 @app.command(help="stop the systemd service of the instance")
 def stop(instance: str):
     servers = load_servers_json()
     service = servers[instance].serviceName
-    run(["systemctl", "stop", service])
+    exec(["systemctl", "stop", service])
 
 @app.command(help="get the uuid of a player")
 def uuid(player: str, format: str = "human"):

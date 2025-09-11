@@ -13,14 +13,23 @@ def fatal(*values: object, exit_code: int = 1):
     printerr("[FATAL] minecrafctl:", *values)
     sys.exit(exit_code)
 
+# this doesn't capture stdout/stderr
+def exec(cmd: List[str], stdin: str | None = None):
+    result = subprocess.run(cmd, text=True, input=stdin)
+    if result.returncode != 0:
+        err = ChildProcessError(result.stderr)
+        err.errno = result.returncode
+        raise err
 
-def run(cmd: List[str], stdin: str | None = None) -> str:
+# this does.
+def run(cmd: List[str], stdin: str | None = None):
     result = subprocess.run(cmd, text=True, input=stdin, capture_output=True)
     if result.returncode != 0:
         err = ChildProcessError(result.stderr)
         err.errno = result.returncode
         raise err
     return result.stdout
+
 
 
 def pretty_table(headers: List[str], body: List[List[Any]]):
