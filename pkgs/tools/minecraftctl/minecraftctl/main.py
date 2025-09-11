@@ -54,9 +54,9 @@ def send(instance: str, command: List[str] = typer.Argument(...)):
         exec(
             [
                 "tmux",
-                "send-keys",
                 "-S",
                 f"{cfg.managementSystem.tmux.socketPath}",
+                "send-keys",
                 cmd,
                 "Enter",
             ]
