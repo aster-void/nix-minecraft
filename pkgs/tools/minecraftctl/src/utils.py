@@ -1,0 +1,89 @@
+import os, sys, subprocess, json, configparser
+from typing import List
+
+from config import serversJsonPath
+from models import MinecraftServer, ServersJson
+
+
+def printerr(*values: object):
+    print(*values, file=sys.stderr)
+
+
+def warn(*values: object):
+    printerr("[WARNING] minecraftctl:", *values)
+
+
+def fatal(*values: object, exit_code: int = 1):
+    printerr("[FATAL] minecrafctl:", *values)
+    sys.exit(exit_code)
+
+
+def run(cmd: List[str], stdin: str = None) -> str:
+    result = subprocess.run(cmd, text=True, input=stdin, capture_output=True)
+    if result.returncode != 0:
+        err = ChildProcessError(result.stderr)
+        err.errno = result.returncode
+        raise err
+    return result.stdout
+
+
+def load_servers_json() -> ServersJson:
+    path = serversJsonPath
+    if not os.path.exists(path):
+        warn(f"Servers definition file does not exist at {path}")
+        return {}
+
+    with open(path) as f:
+        return ServersJson(**json.loads(f.read()))
+
+
+def get_instance(servers: ServersJson, instance: str) -> MinecraftServer:
+    if not instance in servers:
+        fatal(f"Instance not found: {instance}")
+    return MinecraftServer(**servers[instance])
+
+
+def pretty_table(headers: List[str], body: List[List[str]]):
+    out = ""
+    # calculate good-looking length
+    max_lens: List[int] = []
+    for col_i in range(len(headers)):
+        max_len = len(headers[col_i])
+        for row_i in range(len(body)):
+            max_len = max(max_len, len(str(body[row_i][col_i])))
+        max_lens.append(max_len)
+
+    # print header
+    data = ""
+    for col_i in range(len(headers)):
+        width = max_lens[col_i] + 2
+        data += f"{headers[col_i]:<{width}}"
+    out += data + "\n"
+
+    # print separator
+    out += "-" * (sum(max_lens) + 2 * (len(headers) - 1)) + "\n"
+
+    # print body
+    for data in body:
+        row = ""
+        for col_i in range(len(headers)):
+            width = max_lens[col_i] + 2
+            cell = str(data[col_i])
+            if data[col_i] == None:
+                cell = "-"
+            row += f"{cell:<{width}}"
+        out += row + "\n"
+    return out
+
+
+def get_service_status(serviceName: str) -> str:
+    try:
+        status = run(["systemctl", "is-active", serviceName])
+        return status.replace("\n", "")
+    except ChildProcessError as e:
+        if e.errno == 3:  # systemctl exits with code 3 if the service is inactive
+            return "inactive"
+        if len(e.args) == 0 or e.args[0] == "":
+            return "Failed to get status"
+        else:
+            return e.args[0]
