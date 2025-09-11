@@ -73,9 +73,22 @@ def send(instance: str, command: List[str] = typer.Argument(...)):
 @app.command(help="tail the log of the instance")
 def tail(
     instance: str,
-    follow: bool = False,
-    retry: bool = False,
-    F: bool = False,
+    follow: bool = typer.Option(
+        False,
+        "--follow",
+        "-f",
+        help="output appended data as the file grows (tail --follow=name)",
+    ),
+    retry: bool = typer.Option(
+        False,
+        "--retry",
+        help="keep trying to open the file if it is not found (useful with --follow) (tail --retry)",
+    ),
+    F: bool = typer.Option(
+        False,
+        "-F",
+        help="same as --follow --retry (tail -F)",
+    ),
     lines: int = 50,
 ):
     servers = load_servers_json()
@@ -86,7 +99,7 @@ def tail(
     do_retry = (follow and retry) or F
 
     if do_follow:
-        tail_args += ["--follow"]
+        tail_args += ["--follow=name"]
     if do_retry:
         tail_args += ["--retry"]
     tail_args += ["--lines", str(lines)]
