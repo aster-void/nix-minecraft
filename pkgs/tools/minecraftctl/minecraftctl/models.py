@@ -1,5 +1,5 @@
 from logging import fatal
-from typing import Literal, Union
+from typing import Iterator, Literal, Union
 from pydantic import BaseModel, RootModel
 
 
@@ -57,8 +57,8 @@ class ServersJson:
             fatal(f"Server '{key}' not found in servers.json")
         return self._dict[key]
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[str]:
         return iter(self._dict)
 
-    def values(self):
-        return self._dict.values()
+    def values(self) -> Iterator[MinecraftServer]:
+        return iter(self._dict.values())

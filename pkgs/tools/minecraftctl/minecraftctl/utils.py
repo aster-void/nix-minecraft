@@ -48,11 +48,10 @@ def pretty_table(headers: List[str], body: List[List[Any]]) -> str:
         max_lens.append(max_len)
 
     # print header
-    data = ""
     for col_i in range(len(headers)):
         width = max_lens[col_i] + 2
-        data += f"{headers[col_i]:<{width}}"
-    out += data + "\n"
+        out += f"{headers[col_i]:<{width}}"
+    out += "\n"
 
     # print separator
     out += "-" * (sum(max_lens) + 2 * (len(headers) - 1)) + "\n"
@@ -80,4 +79,4 @@ def get_service_status(serviceName: str) -> str:
         if len(e.args) == 0 or e.args[0] == "":
             return "Failed to get status"
         else:
-            return e.args[0]
+            return str(e.args[0])
