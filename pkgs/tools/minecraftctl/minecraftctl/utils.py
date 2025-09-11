@@ -1,28 +1,34 @@
 import sys, subprocess
 from typing import Any, List
 
-def printerr(*values: object):
+
+def printerr(*values: object) -> None:
     print(*values, file=sys.stderr)
 
 
-def warn(*values: object):
+def warn(*values: object) -> None:
     printerr("[WARNING] minecraftctl:", *values)
 
 
-def fatal(*values: object, exit_code: int = 1):
+def fatal(*values: object, exit_code: int = 1) -> None:
     printerr("[FATAL] minecrafctl:", *values)
     sys.exit(exit_code)
 
+
+
+
+
 # this doesn't capture stdout/stderr
-def exec(cmd: List[str], stdin: str | None = None):
+def exec(cmd: List[str], stdin: str | None = None) -> None:
     result = subprocess.run(cmd, text=True, input=stdin)
     if result.returncode != 0:
         err = ChildProcessError(result.stderr)
         err.errno = result.returncode
         raise err
 
+
 # this does.
-def run(cmd: List[str], stdin: str | None = None):
+def run(cmd: List[str], stdin: str | None = None) -> str:
     result = subprocess.run(cmd, text=True, input=stdin, capture_output=True)
     if result.returncode != 0:
         err = ChildProcessError(result.stderr)
@@ -31,8 +37,7 @@ def run(cmd: List[str], stdin: str | None = None):
     return result.stdout
 
 
-
-def pretty_table(headers: List[str], body: List[List[Any]]):
+def pretty_table(headers: List[str], body: List[List[Any]]) -> str:
     out = ""
     # calculate good-looking length
     max_lens: List[int] = []

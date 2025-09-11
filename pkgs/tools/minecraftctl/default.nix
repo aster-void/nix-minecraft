@@ -1,4 +1,4 @@
-{ python313 }:
+{ lib, python313, socat, tmux, coreutils }:
 let
   py = python313;
 in
@@ -12,5 +12,16 @@ py.pkgs.buildPythonApplication {
     py.pkgs.typer
     py.pkgs.pydantic
   ];
+  buildInputs = [
+    socat # systemd-socket
+    tmux  # tmux
+    coreutils # tail
+  ];
+
   pythonImportsCheck = [ "minecraftctl.main" ];
+
+  checkPhase = ''
+    ${lib.getExe py.pkgs.black} .
+    ${lib.getExe py.pkgs.mypy} --strict minecraftctl
+  '';
 }

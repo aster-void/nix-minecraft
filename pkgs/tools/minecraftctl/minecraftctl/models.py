@@ -1,5 +1,7 @@
+from logging import fatal
 from typing import Literal, Union
 from pydantic import BaseModel, RootModel
+
 
 class TmuxConfig(BaseModel):
     socketPath: str
@@ -26,22 +28,23 @@ class SystemdSocketManagement(BaseModel):
 ManagementSystem = Union[TmuxManagement, SystemdSocketManagement]
 
 MCServerType = Literal[
-    "vanilla",
-    "fabric",
-    "legacy fabric", "quilt", "paper", "velocity"]
+    "vanilla", "fabric", "legacy fabric", "quilt", "paper", "velocity"
+]
 
 
 class MinecraftServer(BaseModel):
     name: str
     type: MCServerType
-    mcVersion: str | None # velocity doesn't have a mcVersion
+    mcVersion: str | None  # velocity doesn't have a mcVersion
     port: int
     dataDir: str
     serviceName: str
     managementSystem: ManagementSystem
 
+
 class InternalServersJson(RootModel[dict[str, MinecraftServer]]):
     pass
+
 
 class ServersJson:
     _dict: dict[str, MinecraftServer]
@@ -50,6 +53,8 @@ class ServersJson:
         self._dict = InternalServersJson.model_validate(json).root
 
     def __getitem__(self, key: str) -> MinecraftServer:
+        if key not in self._dict:
+            fatal(f"Server '{key}' not found in servers.json")
         return self._dict[key]
 
     def __iter__(self):
