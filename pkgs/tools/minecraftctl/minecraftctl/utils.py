@@ -15,9 +15,6 @@ def fatal(*values: object, exit_code: int = 1) -> Never:
     sys.exit(exit_code)
 
 
-
-
-
 # this doesn't capture stdout/stderr
 def exec(cmd: List[str], stdin: str | None = None, env: dict[str, str] | None = None):
     result = subprocess.run(cmd, text=True, input=stdin, env=env)
@@ -25,6 +22,7 @@ def exec(cmd: List[str], stdin: str | None = None, env: dict[str, str] | None = 
         err = ChildProcessError(result.stderr)
         err.errno = result.returncode
         raise err
+
 
 # this captures stdout/stderr
 def run(cmd: List[str], stdin: str | None = None) -> str:

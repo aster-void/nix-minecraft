@@ -62,7 +62,7 @@ def send(instance: str, command: List[str] = typer.Argument(...)):
             ]
         )
     elif cfg.managementSystem.type == "systemd-socket":
-        file=cfg.managementSystem.systemdSocket.stdinSocket.path
+        file = cfg.managementSystem.systemdSocket.stdinSocket.path
         stdin = " ".join(command) + "\n"
         with open(file, "w") as sock:
             sock.write(stdin)
@@ -134,7 +134,15 @@ def stop(instance: str):
 
 
 @app.command(help="get the uuid of a player")
-def uuid(player: str, format: str = "human"):
+def uuid(
+    player: str,
+    format: str = typer.Option(
+        "human",
+        "--format",
+        "-f",
+        help="output format: human, json, text",
+    ),
+):
     resp = httpx.get(f"https://api.mojang.com/users/profiles/minecraft/{player}").json()
     if "errorMessage" in resp:
         fatal(resp["errorMessage"])
@@ -154,9 +162,6 @@ def uuid(player: str, format: str = "human"):
             case unknown:
                 fatal(f"Unknown format: {unknown}")
 
-@app.command(help="get the name history of a player by uuid")
-def test():
-    exec(["systemctl", "status", "avahi-daemon"])
 
 if __name__ == "__main__":
     app()
