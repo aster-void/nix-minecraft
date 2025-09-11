@@ -6,3 +6,6 @@ dependencies = ["typer", "pydantic", "httpx"]
 
 [project.scripts]
 minecraftctl = "minecraftctl.main:app"
+
+[tool.pyright]
+typeCheckingMode = "strict"

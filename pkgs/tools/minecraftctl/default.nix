@@ -1,4 +1,4 @@
-{ lib, python313, socat, tmux, coreutils }:
+{ lib, python313, socat, tmux, coreutils, pyright }:
 let
   py = python313;
 in
@@ -22,6 +22,6 @@ py.pkgs.buildPythonApplication {
 
   checkPhase = ''
     ${lib.getExe py.pkgs.black} .
-    ${lib.getExe py.pkgs.mypy} --strict minecraftctl
+    ${lib.getExe pyright} minecraftctl
   '';
 }

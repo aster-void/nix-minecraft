@@ -16,14 +16,14 @@ app = typer.Typer(help="Minecraft server management tool")
 
 
 @app.callback(invoke_without_command=True)
-def init(ctx: typer.Context) -> None:
+def init(ctx: typer.Context):
     if ctx.invoked_subcommand is None:
         typer.echo(ctx.get_help())
         raise typer.Exit()
 
 
 @app.command(help="list available minecraft instances")
-def list() -> None:
+def list():
     servers = load_servers_json()
     headers = ["NAME", "VERSION", "LOADER", "PORT", "STATUS"]
     result: List[List[Any]] = []
@@ -39,14 +39,14 @@ def list() -> None:
 
 
 @app.command(help="show the status of the instance")
-def status(instance: str) -> None:
+def status(instance: str):
     servers = load_servers_json()
     cfg = servers[instance]
     exec(["systemctl", "status", cfg.serviceName, "--no-pager"])
 
 
 @app.command(help="send a command to the instance")
-def send(instance: str, command: List[str] = typer.Argument(...)) -> None:
+def send(instance: str, command: List[str] = typer.Argument(...)):
     servers = load_servers_json()
     cfg = servers[instance]
     if cfg.managementSystem.type == "tmux":
@@ -82,7 +82,7 @@ def tail(
     retry: bool = False,
     F: bool = False,
     lines: int = 50,
-) -> None:
+):
     servers = load_servers_json()
     log_file = servers[instance].dataDir + "/logs/latest.log"
     tail_args = [log_file]
@@ -105,28 +105,28 @@ def tail(
 
 
 @app.command(help="restart the systemd service of the instance")
-def restart(instance: str) -> None:
+def restart(instance: str):
     servers = load_servers_json()
     service = servers[instance].serviceName
     exec(["systemctl", "restart", service])
 
 
 @app.command(help="start the systemd service of the instance")
-def start(instance: str) -> None:
+def start(instance: str):
     servers = load_servers_json()
     service = servers[instance].serviceName
     exec(["systemctl", "start", service])
 
 
 @app.command(help="stop the systemd service of the instance")
-def stop(instance: str) -> None:
+def stop(instance: str):
     servers = load_servers_json()
     service = servers[instance].serviceName
     exec(["systemctl", "stop", service])
 
 
 @app.command(help="get the uuid of a player")
-def uuid(player: str, format: str = "human") -> None:
+def uuid(player: str, format: str = "human"):
     resp = httpx.get(f"https://api.mojang.com/users/profiles/minecraft/{player}").json()
     if "errorMessage" in resp:
         fatal(resp["errorMessage"])

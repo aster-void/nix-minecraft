@@ -2,15 +2,15 @@ import sys, subprocess
 from typing import Any, List
 
 
-def printerr(*values: object) -> None:
+def printerr(*values: object):
     print(*values, file=sys.stderr)
 
 
-def warn(*values: object) -> None:
+def warn(*values: object):
     printerr("[WARNING] minecraftctl:", *values)
 
 
-def fatal(*values: object, exit_code: int = 1) -> None:
+def fatal(*values: object, exit_code: int = 1):
     printerr("[FATAL] minecrafctl:", *values)
     sys.exit(exit_code)
 
@@ -19,15 +19,14 @@ def fatal(*values: object, exit_code: int = 1) -> None:
 
 
 # this doesn't capture stdout/stderr
-def exec(cmd: List[str], stdin: str | None = None) -> None:
+def exec(cmd: List[str], stdin: str | None = None):
     result = subprocess.run(cmd, text=True, input=stdin)
     if result.returncode != 0:
         err = ChildProcessError(result.stderr)
         err.errno = result.returncode
         raise err
 
-
-# this does.
+# this captures stdout/stderr
 def run(cmd: List[str], stdin: str | None = None) -> str:
     result = subprocess.run(cmd, text=True, input=stdin, capture_output=True)
     if result.returncode != 0:
