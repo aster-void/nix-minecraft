@@ -12,14 +12,12 @@ py.pkgs.buildPythonApplication {
     py.pkgs.typer
     py.pkgs.pydantic
   ];
-  buildInputs = [
-    socat # systemd-socket
-    tmux  # tmux
-    coreutils # tail
-  ];
 
+  makeWrapperArgs = [ "--prefix" "PATH" ":" (lib.makeBinPath [
+    socat tmux coreutils ]) ];
   pythonImportsCheck = [ "minecraftctl.main" ];
 
+  strictDeps = true;
   checkPhase = ''
     ${lib.getExe py.pkgs.black} .
     ${lib.getExe pyright} minecraftctl

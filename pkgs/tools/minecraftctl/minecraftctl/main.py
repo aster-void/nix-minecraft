@@ -146,6 +146,9 @@ def uuid(player: str, format: str = "human"):
             case unknown:
                 fatal(f"Unknown format: {unknown}")
 
+@app.command(help="get the name history of a player by uuid")
+def test():
+    exec(["systemctl", "status", "avahi-daemon"])
 
 if __name__ == "__main__":
     app()
